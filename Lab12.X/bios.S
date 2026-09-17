@@ -12,7 +12,9 @@
 ;   RD0-RD7 - POST / status LEDs (RD7 doubles as ISR-toggle LED)
 ;   RA4     - heartbeat / SOS LED
 ;   RB0     - INT0 external button (active-low, 10k pull-up)
-;   RE0     - RAM-test fault jumper: ground it to force POST failure
+;   RE0     - RAM-test fault jumper (10k pull-up to 3.3V): ground it
+;             to force POST failure. Without the pull-up the pin
+;             floats and the boot decision is a coin flip.
 ;
 ; Build (pic-as driver - this is what CI runs):
 ;   pic-as -mcpu=18F46K22 -Wl,-presetVec=0h,-pintVec=8h -o firmware.hex bios.S
