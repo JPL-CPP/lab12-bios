@@ -169,33 +169,34 @@ sos_dots2:
     call    blink_short
     decfsz  sos_i,f,a
     bra     sos_dots2
+    movlw   20                  ; 2 s dark between SOS letters
+    movwf   del_c,a
+sos_gap:
     call    delay_100ms
-    call    delay_100ms
-    call    delay_100ms
-    call    delay_100ms
-    call    delay_100ms
-    call    delay_100ms
-    call    delay_100ms
+    decfsz  del_c,f,a
+    bra     sos_gap
     bra     sos_loop
 
-blink_short:
+blink_short:                    ; DOT: quick 50 ms flick, 150 ms off
     bsf     LATA,4,a
-    call    delay_100ms
     call    delay_50ms
     bcf     LATA,4,a
     call    delay_100ms
     call    delay_50ms
     return
 
-blink_long:
-    bsf     LATA,4,a
+blink_long:                     ; DASH: a full 1 s on, 300 ms off -
+    bsf     LATA,4,a            ; deliberately nothing like the 1 Hz
+    movlw   10                  ; heartbeat
+    movwf   del_c,a
+bl_on:
     call    delay_100ms
-    call    delay_100ms
-    call    delay_100ms
-    call    delay_50ms
+    decfsz  del_c,f,a
+    bra     bl_on
     bcf     LATA,4,a
     call    delay_100ms
-    call    delay_50ms
+    call    delay_100ms
+    call    delay_100ms
     return
 
 ; =====================================================================
