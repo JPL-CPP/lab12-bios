@@ -74,7 +74,17 @@ boot:
 
     ; TODO: I/O so POST can report:
     ;       - all ANSELx digital (ANSELA/B/D/E = 0)
-    ;       - PORTD all outputs, LEDs off
+    ;         !! TRAP: the ANSELx registers live at 0xF38-0xF3C, which
+    ;         is BELOW the access-bank SFR window (0xF60+). Clearing
+    ;         them with ",a" assembles without warning but silently
+    ;         writes ordinary RAM - the pins stay analog and analog
+    ;         pins always READ AS 0. Use banked access instead:
+    ;             banksel ANSELA
+    ;             clrf    BANKMASK(ANSELA),b
+    ;             ...
+    ;             movlb   0
+    ;       - PORTD all outputs, LEDs off (TRIS/LAT are at 0xF80+,
+    ;         inside the access bank - ",a" is fine for those)
     ;       - RA4 output, off
     ;       - RB0 input (INT0 button), RE0 input (fault jumper)
 
