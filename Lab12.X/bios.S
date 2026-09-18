@@ -16,8 +16,9 @@
 ;             to force POST failure. Without the pull-up the pin
 ;             floats and the boot decision is a coin flip.
 ;
-; Build (pic-as driver - this is what CI runs):
-;   pic-as -mcpu=18F46K22 -Wl,-presetVec=0h,-pintVec=8h -o firmware.hex bios.S
+; Build (pic-as driver - this is what CI runs; NO linker options
+; are needed: the vector psects are absolute, ORG'd in the source):
+;   pic-as -mcpu=18F46K22 -o firmware.hex bios.S
 ;
 ; PROVIDED: config bits, delay routines, SOS trap, app_blink.
 ; YOU WRITE: boot init, RAM test, LED sweep, ISR body, vector setup.
@@ -45,17 +46,20 @@ sos_i:      DS 1        ; SOS pattern index
 
 ; =====================================================================
 ; RESET VECTOR - the very first instruction the CPU executes.
-; The linker places this psect at address 0x0000.
+; An ABSOLUTE psect: the ORG below pins it to address 0x0000 in
+; the source itself - no linker options, no IDE settings.
 ; =====================================================================
-PSECT resetVec,class=CODE,reloc=2
+PSECT resetVec,abs,ovrld,class=CODE,reloc=2
+    ORG     0x0000
 resetVec:
     goto    boot
 
 ; =====================================================================
-; HIGH-PRIORITY INTERRUPT VECTOR - placed at address 0x0008.
+; HIGH-PRIORITY INTERRUPT VECTOR - absolute psect ORG'd to 0x0008.
 ; "Installing an interrupt vector" = putting code at this address.
 ; =====================================================================
-PSECT intVec,class=CODE,reloc=2
+PSECT intVec,abs,ovrld,class=CODE,reloc=2
+    ORG     0x0008
 intVec:
     ; TODO: 1. If INT0IF (INTCON bit 1) is NOT set, return (retfie 1)
     ;       2. Blink RD7 rapidly for ~2 seconds (about 10 flashes:
