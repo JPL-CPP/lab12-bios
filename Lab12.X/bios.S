@@ -112,6 +112,11 @@ post_leds:
     ;       ~100 ms per step (use the provided delay_100ms).
     ;       Hints: start LATD=0x01; rlcf LATD shifts the bit left;
     ;       the carry flag tells you when it walked off RD7.
+    ;       !! TRAP: the provided delay routines use del_a and del_b
+    ;       as scratch and leave them clobbered. Your pass counter
+    ;       must be a NEW variable (declare it in udata_acs) - a
+    ;       counter in del_a/del_b gets wiped by every delay call
+    ;       and the sweep loops forever.
 
     ; TODO: verify the RB0 button reads RELEASED (high).
     ;       Held/stuck at boot -> goto sos_trap.
