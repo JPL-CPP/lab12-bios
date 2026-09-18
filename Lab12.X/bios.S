@@ -58,8 +58,16 @@ resetVec:
 PSECT intVec,class=CODE,reloc=2
 intVec:
     ; TODO: 1. If INT0IF (INTCON bit 1) is NOT set, return (retfie 1)
-    ;       2. Toggle RD7 (btg LATD,7,a) to prove the ISR ran
-    ;       3. Clear INT0IF
+    ;       2. Blink RD7 rapidly for ~2 seconds (about 10 flashes:
+    ;          20 toggles of LATD bit 7, ~100 ms apart) so the press
+    ;          is unmistakable.
+    ;          !! TRAP: do NOT call delay_100ms from here - the
+    ;          interrupt may have fired INSIDE delay_100ms, and
+    ;          calling it again clobbers del_a/del_b mid-count in
+    ;          the interrupted code. Write your own delay loop with
+    ;          NEW variables (declare them in udata_acs).
+    ;       3. Clear INT0IF AFTER the blink - bounce edges that
+    ;          arrived during the blink get swallowed
     ;       4. retfie 1  (fast return restores W/STATUS/BSR shadows)
     retfie  1
 
